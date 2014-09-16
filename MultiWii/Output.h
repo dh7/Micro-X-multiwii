@@ -8,4 +8,5 @@ void mixTable();
 void writeServos();
 void writeMotors();
 
+void blinkLED(uint8_t num, uint8_t ontime,uint8_t repeat);
 #endif /* OUTPUT_H_ */

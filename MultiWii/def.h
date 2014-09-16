@@ -2,119 +2,6 @@
 #define DEF_H_
 
 /**************************************************************************************/
-/***************             test configurations                   ********************/
-/**************************************************************************************/
-#if COPTERTEST == 1
-  #define QUADP
-  #define WMP
-#elif COPTERTEST == 2
-  #define FLYING_WING
-  #define WMP
-  #define BMA020
-  #define FAILSAFE
-  #define LCD_CONF
-  #define LCD_TEXTSTAR
-  #define VBAT
-  #define POWERMETER_SOFT
-#elif COPTERTEST == 3
-  #define TRI
-  #define FREEIMUv035_MS
-  #define BUZZER
-  #define VBAT
-  #define POWERMETER_HARD
-  #define LCD_CONF
-  #define LCD_CONF_AUX
-  #define LCD_VT100
-  #define LCD_TELEMETRY
-  #define LCD_TELEMETRY_STEP "01245"
-  #define LOG_VALUES 1
-  #define SUPPRESS_BARO_ALTHOLD
-  #define VARIOMETER 12
-#elif COPTERTEST == 4
-  #define QUADX
-  #define CRIUS_SE
-  #define SPEKTRUM 2048
-  #define LED_RING
-  #define GPS_SERIAL 2
-  #define LOG_VALUES 2
-  #define LOG_PERMANENT
-  #define LOG_PERMANENT_SERVICE_LIFETIME 36000
-#elif COPTERTEST == 5
-  #define HELI_120_CCPM
-  #define CRIUS_LITE
-  #undef DISABLE_POWER_PIN
-  #define RCAUXPIN8
-  #define OLED_I2C_128x64
-  #define LCD_TELEMETRY
-  #define LOG_VALUES 3
-  #define DEBUG
-  #undef SERVO_RFR_50HZ
-  #define SERVO_RFR_160HZ
-  #define VBAT
-  #define POWERMETER_SOFT
-  #define MMGYRO 10
-  #define MMGYROVECTORLENGTH 15
-  #define GYRO_SMOOTHING {45, 45, 50}
-  #define INFLIGHT_ACC_CALIBRATION
-  #define LOG_PERMANENT
-  #define LOG_PERMANENT_SHOW_AT_STARTUP
-  #define LOG_PERMANENT_SHOW_AT_L
-  #define LOG_PERMANENT_SERVICE_LIFETIME 36000
-  #define GOVERNOR_P 0
-  #define GOVERNOR_D 10
-  #define VOLTAGEDROP_COMPENSATION
-#elif COPTERTEST == 6
-  #define HEX6H
-  #define DIYFLYING_MAGE_V1
-  #define BUZZER
-  #define RCOPTIONSBEEP // ca. 80byte
-  #define ARMEDTIMEWARNING 480 // 8 min = 480seconds
-  #define VBAT
-  #define VOLTAGEDROP_COMPENSATION
-  #define MEGA_HW_PWM_SERVOS
-  #define SERVO_RFR_RATE  300    // In Hz, you can set it from 20 to 400Hz, used only in HW PWM mode
-  #define LOG_VALUES 1
-  #define DEBUG
-  #define MULTIPLE_CONFIGURATION_PROFILES
-  #define DISPLAY_FONT_DSIZE
-  #define OLED_DIGOLE
-  #define LCD_CONF
-#elif COPTERTEST == 7
-  #define HELI_120_CCPM
-  #define NANOWII
-  #define FORCE_ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  = X; imu.accADC[PITCH]  =  Y; imu.accADC[YAW]  =  Z;}
-  #define FORCE_GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] = -Y; imu.gyroADC[PITCH] = X; imu.gyroADC[YAW] = -Z;}
-  #define A32U4_4_HW_PWM_SERVOS
-  #define SERVO_RFR_RATE  200    // 200 for graupner is ok
-  #define SERVO_PIN5_RFR_RATE  165    // In Hz, you can set it from 20 to 400Hz, used only in HW PWM mode for mega and 32u4
-  #define SPEKTRUM 1024
-  #define BUZZER
-  #define RCOPTIONSBEEP // ca. 80byte
-  #define VBAT
-  #define LOG_VALUES 1
-  #define DISPLAY_FONT_DSIZE
-  #define OLED_DIGOLE
-  #define LCD_CONF
-  #define LCD_TELEMETRY
-  #define LCD_TELEMETRY_AUTO "1"
-  #define LCD_TELEMETRY_STEP "F14$5R"
-  #define LOG_PERMANENT
-  #define LOG_PERMANENT_SHOW_AFTER_CONFIG
-  #define SUPPRESS_OTHER_SERIAL_COMMANDS
-  #define SUPPRESS_DEFAULTS_FROM_GUI
-  #define NO_FLASH_CHECK
-  #define DEBUG_FREE
-#elif COPTERTEST == 8
-  #define BI
-  #define ITG3200
-  #define PID_CONTROLLER 2
-  #define ESC_CALIB_CANNOT_FLY
-#elif defined(COPTERTEST)
-  #error "*** this test is not yet defined"
-#endif
-
-
-/**************************************************************************************/
 /***************             Proc specific definitions             ********************/
 /**************************************************************************************/
 // Proc auto detection
@@ -524,6 +411,7 @@
   #else
     #define V_BATPIN                  A2    // Analog PIN 3
   #endif
+
   #if !defined(TEENSY20)
     #define PSENSORPIN                A2    // Analog PIN 2 
   #else
@@ -849,6 +737,34 @@
 
 
 //please submit any correction to this list.
+
+#if defined(HK_POCKETQUAD)
+  #define HWPWM6
+  #define MPU6050
+  #define ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  =  -X; imu.accADC[PITCH]  = -Y; imu.accADC[YAW]  = Z;}
+  #define GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] = Y; imu.gyroADC[PITCH] =  -X; imu.gyroADC[YAW] = -Z;}
+  #define VBATSCALE       108 // (*) (**) change this value if readed Battery voltage is different than real voltage
+  #define V_BATPIN        A8    // Analog PIN 8, require hardware mod
+#endif
+
+#if defined(HK_MICRO_X)
+	#define MPU6050
+	#define ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  =  X; imu.accADC[PITCH]  = Y; imu.accADC[YAW]  = Z;}
+	#define GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] = -Y; imu.gyroADC[PITCH] =  X; imu.gyroADC[YAW] = -Z;}
+	#define RC_CHANS 8
+	#define VBATSCALE       54 // (*) (**) change this value if readed Battery voltage is different than real voltage
+	#define V_BATPIN        A2    // Analog PIN 2
+#endif
+
+#if defined(HK_MICRO_MWC)
+  #define MPU6050
+  #define ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  = -X; imu.accADC[PITCH]  = -Y; imu.accADC[YAW]  =  Z;}
+  #define GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] =  Y; imu.gyroADC[PITCH] = -X; imu.gyroADC[YAW] = -Z;}
+  #define RC_CHANS 8
+  #define VBATSCALE       54 // (*) (**) change this value if readed Battery voltage is different than real voltage
+  #define V_BATPIN        A2    // Analog PIN 2
+#endif
+
 #if defined(FFIMUv1)
   #define ITG3200
   #define BMA180
@@ -1187,11 +1103,11 @@
 #if defined(CRIUS_SE)
   #define ITG3200
   #define BMA180
-  #define HMC5883
-  #define BMP085
+  //#define HMC5883
+  //#define BMP085
   #define ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  = -X; imu.accADC[PITCH]  = -Y; imu.accADC[YAW]  =  Z;}
   #define GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] =  Y; imu.gyroADC[PITCH] = -X; imu.gyroADC[YAW] = -Z;}
-  #define MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  =  X; imu.magADC[PITCH]  =  Y; imu.magADC[YAW]  = -Z;}
+  //#define MAG_ORIENTATION(X, Y, Z)  {imu.magADC[ROLL]  =  X; imu.magADC[PITCH]  =  Y; imu.magADC[YAW]  = -Z;}
 #endif
 
 #if defined(CRIUS_SE_v2_0)
@@ -1508,56 +1424,6 @@
   #undef INTERNAL_I2C_PULLUPS
 #endif
 
-#if defined(OPENLRSv2MULTI)
-  #define ITG3200
-  #define ADXL345
-  #define ACC_ORIENTATION(X, Y, Z)  {imu.accADC[ROLL]  = -X; imu.accADC[PITCH]  = -Y; imu.accADC[YAW]  =  Z;}
-  #define GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] =  Y; imu.gyroADC[PITCH] = -X; imu.gyroADC[YAW] = -Z;}
-  #define ADXL345_ADDRESS 0x53
-  
-  #define SDO_pin A0
-  #define SDI_pin A1        
-  #define SCLK_pin A2 
-  #define IRQ_pin 2
-  #define nSel_pin 4
-  #define IRQ_interrupt 0
-  
-  #define  nIRQ_1 (PIND & 0x04)==0x04 //D2
-  #define  nIRQ_0 (PIND & 0x04)==0x00 //D2
-  
-  #define  nSEL_on PORTD |= 0x10 //D4
-  #define  nSEL_off PORTD &= 0xEF //D4
-  
-  #define  SCK_on PORTC |= 0x04 //C2
-  #define  SCK_off PORTC &= 0xFB //C2
-  
-  #define  SDI_on PORTC |= 0x02 //C1
-  #define  SDI_off PORTC &= 0xFD //C1
-  
-  #define  SDO_1 (PINC & 0x01) == 0x01 //C0
-  #define  SDO_0 (PINC & 0x01) == 0x00 //C0
-  
-  //#### Other interface pinouts ###
-  #define GREEN_LED_pin 13
-  #define RED_LED_pin A3
-
-  #define Red_LED_ON  PORTC |= _BV(3);
-  #define Red_LED_OFF  PORTC &= ~_BV(3);
-  
-  #define Green_LED_ON  PORTB |= _BV(5);
-  #define Green_LED_OFF  PORTB &= ~_BV(5);
-  
-  #define NOP() __asm__ __volatile__("nop") 
- 
-  #define RF22B_PWRSTATE_READY    01 
-  #define RF22B_PWRSTATE_TX        0x09 
-  #define RF22B_PWRSTATE_RX       05 
-  #define RF22B_Rx_packet_received_interrupt   0x02 
-  #define RF22B_PACKET_SENT_INTERRUPT  04 
-  #define RF22B_PWRSTATE_POWERDOWN  00    
-
-#endif
-
 #if defined(DESQUARED6DOFV2GO)
   #define ITG3200
   #define GYRO_ORIENTATION(X, Y, Z) {imu.gyroADC[ROLL] =  Y; imu.gyroADC[PITCH] = -X; imu.gyroADC[YAW] = -Z;}
@@ -1643,16 +1509,13 @@
   #define ACC_1G 265
 #endif
 #if defined(BMA180)
-  #define ACC_1G 255
+  #define ACC_1G 4096
 #endif
 #if defined(BMA280)
   #define ACC_1G 255
 #endif
 #if defined(BMA020)
   #define ACC_1G 63
-#endif
-#if defined(NUNCHACK)
-  #define ACC_1G 200
 #endif
 #if defined(LIS3LV02)
   #define ACC_1G 256
@@ -1664,11 +1527,7 @@
   #define ACC_1G 75
 #endif
 #if defined(MPU6050)
-  #if defined(FREEIMUv04)
-    #define ACC_1G 255
-  #else
-    #define ACC_1G 512
-  #endif
+  #define ACC_1G 4096
 #endif
 #if defined(LSM330)
   #define ACC_1G 256

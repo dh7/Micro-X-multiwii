@@ -30,6 +30,14 @@ enum pid {
   PIDITEMS
 };
 
+#define NUMPIDSETS 2
+enum pid_set {
+  PID_ROLL,
+  PID_PITCH,
+  PID_LEVEL,
+  PIDSETITEMS
+};
+
 enum box {
   BOXARM,
   #if ACC
@@ -42,6 +50,14 @@ enum box {
   #ifdef VARIOMETER
     BOXVARIO,
   #endif
+  
+  #ifdef HEADFREE
+	BOXHEADFREE,
+  #endif
+  #ifdef HEADHOLD
+	BOXHEADHOLD,
+  #endif
+  
   #if MAG
     BOXMAG,
     BOXHEADFREE,
@@ -73,8 +89,8 @@ enum box {
   #ifdef INFLIGHT_ACC_CALIBRATION
     BOXCALIB,
   #endif
-  #ifdef GOVERNOR_P
-    BOXGOV,
+  #ifdef PID_SWITCH
+    BOXPID,
   #endif
   #ifdef OSD_SWITCH
     BOXOSD,
@@ -120,12 +136,14 @@ typedef struct {
   uint8_t GPS_HOME_MODE :1 ;
   uint8_t GPS_HOLD_MODE :1 ;
   uint8_t HEADFREE_MODE :1 ;
+  uint8_t HEADHOLD_MODE :1 ;
   uint8_t PASSTHRU_MODE :1 ;
   uint8_t GPS_FIX :1 ;
   uint8_t GPS_FIX_HOME :1 ;
   uint8_t SMALL_ANGLES_25 :1 ;
   uint8_t CALIBRATE_MAG :1 ;
   uint8_t VARIO_MODE :1;
+  uint8_t PID_MODE :1;
 } flags_struct_t;
 
 typedef struct {
@@ -151,6 +169,7 @@ struct servo_conf_ {  // this is a generic way to configure a servo, every multi
 
 typedef struct {
   pid_    pid[PIDITEMS];
+  pid_    pidset[NUMPIDSETS][PIDSETITEMS];
   uint8_t rcRate8;
   uint8_t rcExpo8;
   uint8_t rollPitchRate;
@@ -190,10 +209,6 @@ typedef struct {
     uint16_t armedtimewarning;
   #endif
   int16_t minthrottle;
-  #ifdef GOVERNOR_P
-   int16_t governorP;
-   int16_t governorD;
-  #endif
   uint8_t  checksum;      // MUST BE ON LAST POSITION OF CONF STRUCTURE !
 } conf_t;
 

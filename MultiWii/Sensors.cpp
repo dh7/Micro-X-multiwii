@@ -3,10 +3,9 @@
 #include "def.h"
 #include "types.h"
 #include "MultiWii.h"
-#include "Alarms.h"
+#include "Output.h"
 #include "EEPROM.h"
 #include "IMU.h"
-#include "LCD.h"
 
 void i2c_BMP085_UT_Start(void);
 
@@ -298,38 +297,29 @@ uint8_t i2c_readReg(uint8_t add, uint8_t reg) {
 // GYRO common part
 // ****************
 void GYRO_Common() {
-  static int16_t previousGyroADC[3] = {0,0,0};
   static int32_t g[3];
   uint8_t axis, tilt=0;
-
-#if defined MMGYRO       
-  // Moving Average Gyros by Magnetron1
-  //---------------------------------------------------
-  static int16_t mediaMobileGyroADC[3][MMGYROVECTORLENGTH];
-  static int32_t mediaMobileGyroADCSum[3];
-  static uint8_t mediaMobileGyroIDX;
-  //---------------------------------------------------
-#endif
+  
+  #if defined(GYROCALIBRATIONFAILSAFE)
+    uint16_t previousGyroADC[3];
+  #endif
 
   if (calibratingG>0) {
     for (axis = 0; axis < 3; axis++) {
       // Reset g[axis] at start of calibration
       if (calibratingG == 512) {
         g[axis]=0;
-        
+        gyroZero[axis]=0;       
         #if defined(GYROCALIBRATIONFAILSAFE)
             previousGyroADC[axis] = imu.gyroADC[axis];
           }
           if (calibratingG % 10 == 0) {
-            if(abs(imu.gyroADC[axis] - previousGyroADC[axis]) > 8) tilt=1;
+            if(abs(imu.gyroADC[axis] - previousGyroADC[axis]) > 32) tilt=1;
             previousGyroADC[axis] = imu.gyroADC[axis];
        #endif
       }
       // Sum up 512 readings
-      g[axis] +=imu.gyroADC[axis];
-      // Clear global variables for next reading
-      imu.gyroADC[axis]=0;
-      gyroZero[axis]=0;
+      g[axis] += imu.gyroADC[axis];
       if (calibratingG == 1) {
         gyroZero[axis]=(g[axis]+256)>>9;
       #if defined(BUZZER)
@@ -350,26 +340,11 @@ void GYRO_Common() {
       return;
     #else
       calibratingG--;
-    #endif
-    
+    #endif    
   }
 
-#ifdef MMGYRO       
-  mediaMobileGyroIDX = ++mediaMobileGyroIDX % conf.mmgyro;
   for (axis = 0; axis < 3; axis++) {
     imu.gyroADC[axis]  -= gyroZero[axis];
-    mediaMobileGyroADCSum[axis] -= mediaMobileGyroADC[axis][mediaMobileGyroIDX];
-    //anti gyro glitch, limit the variation between two consecutive readings
-    mediaMobileGyroADC[axis][mediaMobileGyroIDX] = constrain(imu.gyroADC[axis],previousGyroADC[axis]-800,previousGyroADC[axis]+800);
-    mediaMobileGyroADCSum[axis] += mediaMobileGyroADC[axis][mediaMobileGyroIDX];
-    imu.gyroADC[axis] = mediaMobileGyroADCSum[axis] / conf.mmgyro;
-#else 
-  for (axis = 0; axis < 3; axis++) {
-    imu.gyroADC[axis]  -= gyroZero[axis];
-    //anti gyro glitch, limit the variation between two consecutive readings
-    imu.gyroADC[axis] = constrain(imu.gyroADC[axis],previousGyroADC[axis]-800,previousGyroADC[axis]+800);
-#endif    
-    previousGyroADC[axis] = imu.gyroADC[axis];
   }
 
   #if defined(SENSORS_TILT_45DEG_LEFT)
@@ -392,7 +367,7 @@ void ACC_Common() {
   if (calibratingA>0) {
     for (uint8_t axis = 0; axis < 3; axis++) {
       // Reset a[axis] at start of calibration
-      if (calibratingA == 512) a[axis]=0;
+      if (calibratingA == 512) { a[axis]=0; global_conf.accZero[axis]=0; };
       // Sum up 512 readings
       a[axis] +=imu.accADC[axis];
       // Clear global variables for next reading
@@ -883,9 +858,9 @@ void ACC_getADC () {
   TWBR = ((F_CPU / 400000L) - 16) / 2;  // Optional line.  Sensor is good for it in the spec.
   i2c_getSixRawADC(BMA180_ADDRESS,0x02);
   //usefull info is on the 14 bits  [2-15] bits  /4 => [0-13] bits  /4 => 12 bit resolution
-  ACC_ORIENTATION( ((rawADC[1]<<8) | rawADC[0])>>4 ,
-                   ((rawADC[3]<<8) | rawADC[2])>>4 ,
-                   ((rawADC[5]<<8) | rawADC[4])>>4 );
+  ACC_ORIENTATION( ((rawADC[1]<<8) | rawADC[0]) ,
+                   ((rawADC[3]<<8) | rawADC[2]) ,
+                   ((rawADC[5]<<8) | rawADC[4]) );
   ACC_Common();
 }
 #endif
@@ -944,29 +919,6 @@ void ACC_getADC(){
   ACC_ORIENTATION( ((rawADC[1]<<8) | rawADC[0])>>6 ,
                    ((rawADC[3]<<8) | rawADC[2])>>6 ,
                    ((rawADC[5]<<8) | rawADC[4])>>6 );
-  ACC_Common();
-}
-#endif
-
-// ************************************************************************************************************
-// standalone I2C Nunchuk
-// ************************************************************************************************************
-#if defined(NUNCHACK)
-#define NUNCHACK_ADDRESS 0x52
-
-void ACC_init() {
-  i2c_writeReg(NUNCHACK_ADDRESS ,0xF0 ,0x55 );
-  i2c_writeReg(NUNCHACK_ADDRESS ,0xFB ,0x00 );
-  delay(250);
-}
-
-void ACC_getADC() {
-  TWBR = ((F_CPU / I2C_SPEED) - 16) / 2; // change the I2C clock rate. !! you must check if the nunchuk is ok with this freq
-  i2c_getSixRawADC(NUNCHACK_ADDRESS,0x00);
-
-  ACC_ORIENTATION(  ( (rawADC[3]<<2)        + ((rawADC[5]>>4)&0x2) ) ,
-                  - ( (rawADC[2]<<2)        + ((rawADC[5]>>3)&0x2) ) ,
-                    ( ((rawADC[4]&0xFE)<<2) + ((rawADC[5]>>5)&0x6) ));
   ACC_Common();
 }
 #endif
@@ -1072,8 +1024,6 @@ void Gyro_getADC () {
 void Gyro_init() {
   delay(100);
   i2c_writeReg(ITG3200_ADDRESS, 0x3E, 0x80); //register: Power Management  --  value: reset device
-//  delay(5);
-//  i2c_writeReg(ITG3200_ADDRESS, 0x15, ITG3200_SMPLRT_DIV); //register: Sample Rate Divider  -- default value = 0: OK
   delay(5);
   i2c_writeReg(ITG3200_ADDRESS, 0x16, 0x18 + ITG3200_DLPF_CFG); //register: DLPF_CFG - low pass filter configuration
   delay(5);
@@ -1082,11 +1032,10 @@ void Gyro_init() {
 }
 
 void Gyro_getADC () {
-  TWBR = ((F_CPU / 400000L) - 16) / 2; // change the I2C clock rate to 400kHz
   i2c_getSixRawADC(ITG3200_ADDRESS,0X1D);
-  GYRO_ORIENTATION( ((rawADC[0]<<8) | rawADC[1])>>2 , // range: +/- 8192; +/- 2000 deg/sec
-                    ((rawADC[2]<<8) | rawADC[3])>>2 ,
-                    ((rawADC[4]<<8) | rawADC[5])>>2 );
+  GYRO_ORIENTATION( ((rawADC[0]<<8) | rawADC[1]) , // range: +/- 8192; +/- 2000 deg/sec
+                    ((rawADC[2]<<8) | rawADC[3]) ,
+                    ((rawADC[4]<<8) | rawADC[5]) );
   GYRO_Common();
 }
 #endif
@@ -1383,9 +1332,9 @@ void Gyro_init() {
 
 void Gyro_getADC () {
   i2c_getSixRawADC(MPU6050_ADDRESS, 0x43);
-  GYRO_ORIENTATION( ((rawADC[0]<<8) | rawADC[1])>>2 , // range: +/- 8192; +/- 2000 deg/sec
-                    ((rawADC[2]<<8) | rawADC[3])>>2 ,
-                    ((rawADC[4]<<8) | rawADC[5])>>2 );
+  GYRO_ORIENTATION( ((rawADC[0]<<8) | rawADC[1]) , // range: +/- 8192; +/- 2000 deg/sec
+                    ((rawADC[2]<<8) | rawADC[3]) ,
+                    ((rawADC[4]<<8) | rawADC[5]) );
   GYRO_Common();
 }
 
@@ -1408,9 +1357,9 @@ void ACC_init () {
 
 void ACC_getADC () {
   i2c_getSixRawADC(MPU6050_ADDRESS, 0x3B);
-  ACC_ORIENTATION( ((rawADC[0]<<8) | rawADC[1])>>3 ,
-                   ((rawADC[2]<<8) | rawADC[3])>>3 ,
-                   ((rawADC[4]<<8) | rawADC[5])>>3 );
+  ACC_ORIENTATION( ((rawADC[0]<<8) | rawADC[1]) ,
+                   ((rawADC[2]<<8) | rawADC[3]) ,
+                   ((rawADC[4]<<8) | rawADC[5]) );
   ACC_Common();
 }
 

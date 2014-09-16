@@ -31,40 +31,25 @@
 /*****************                                                                 ***************/
 /*************************************************************************************************/
 
+  /***************************    Timing of the actions  ********************************/
+    #define CHECK_RCTIME 20000 // in us, interval to check for new RC data
+    #define PIDCALCTIME 3000   // in us, Time interval for PID calculation
+    #define SCALECORR 715.0f   // PIDCALCTIME / 4
+   
   /**************************    The type of multicopter    ****************************/
-    //#define GIMBAL
-    //#define BI
     //#define TRI
     //#define QUADP
-    //#define QUADX
+    #define QUADX
     //#define Y4
-    //#define Y6
-    //#define HEX6
-    //#define HEX6X
-    //#define HEX6H  // New Model
-    //#define OCTOX8
-    //#define OCTOFLATP
-    //#define OCTOFLATX
-    //#define FLYING_WING
-    //#define VTAIL4
-    //#define AIRPLANE
-    //#define SINGLECOPTER
-    //#define DUALCOPTER
-    //#define HELI_120_CCPM
-    //#define HELI_90_DEG
 
   /****************************    Motor minthrottle    *******************************/
     /* Set the minimum throttle command sent to the ESC (Electronic Speed Controller)
        This is the minimum value that allow motors to run at a idle speed  */
-    //#define MINTHROTTLE 1300 // for Turnigy Plush ESCs 10A
-    //#define MINTHROTTLE 1120 // for Super Simple ESCs 10A
-    //#define MINTHROTTLE 1064 // special ESC (simonk)
-    //#define MINTHROTTLE 1050 // for brushed ESCs like ladybird
-    #define MINTHROTTLE 1150 // (*) (**)
+    #define MINTHROTTLE 1050 // (*) (**)
 
   /****************************    Motor maxthrottle    *******************************/
     /* this is the maximum value for the ESCs at full power, this value can be increased up to 2000 */
-    #define MAXTHROTTLE 1850
+    #define MAXTHROTTLE 2000
 
   /****************************    Mincommand          *******************************/
     /* this is the value for the ESCs when they are not armed
@@ -72,8 +57,7 @@
     #define MINCOMMAND  1000
 
   /**********************************    I2C speed   ************************************/
-    #define I2C_SPEED 100000L     //100kHz normal mode, this value must be used for a genuine WMP
-    //#define I2C_SPEED 400000L   //400kHz fast mode, it works only with some WMP clones
+    #define I2C_SPEED 400000L   //400kHz fast mode, it works only with some WMP clones
 
   /***************************    Internal i2c Pullups   ********************************/
     /* enable internal I2C pull ups (in most cases it is better to use external pullups) */
@@ -87,75 +71,12 @@
       /* if you use a specific sensor board:
          please submit any correction to this list.
            Note from Alex: I only own some boards, for other boards, I'm not sure, the info was gathered via rc forums, be cautious */
-      //#define FFIMUv1         // first 9DOF+baro board from Jussi, with HMC5843                   <- confirmed by Alex
-      //#define FFIMUv2         // second version of 9DOF+baro board from Jussi, with HMC5883       <- confirmed by Alex
-      //#define FREEIMUv1       // v0.1 & v0.2 & v0.3 version of 9DOF board from Fabio
-      //#define FREEIMUv03      // FreeIMU v0.3 and v0.3.1
-      //#define FREEIMUv035     // FreeIMU v0.3.5 no baro
-      //#define FREEIMUv035_MS  // FreeIMU v0.3.5_MS                                                <- confirmed by Alex
-      //#define FREEIMUv035_BMP // FreeIMU v0.3.5_BMP
-      //#define FREEIMUv04      // FreeIMU v0.4 with MPU6050, HMC5883L, MS561101BA                  <- confirmed by Alex
-      //#define FREEIMUv043     // same as FREEIMUv04 with final MPU6050 (with the right ACC scale)
-      //#define NANOWII         // the smallest multiwii FC based on MPU6050 + pro micro based proc <- confirmed by Alex
-      //#define PIPO            // 9DOF board from erazz
-      //#define QUADRINO        // full FC board 9DOF+baro board from witespy  with BMP085 baro     <- confirmed by Alex
-      //#define QUADRINO_ZOOM   // full FC board 9DOF+baro board from witespy  second edition
-      //#define QUADRINO_ZOOM_MS// full FC board 9DOF+baro board from witespy  second edition       <- confirmed by Alex
-      //#define ALLINONE        // full FC board or standalone 9DOF+baro board from CSG_EU
-      //#define AEROQUADSHIELDv2
-      //#define ATAVRSBIN1      // Atmel 9DOF (Contribution by EOSBandi). requires 3.3V power.
-      //#define SIRIUS          // Sirius Navigator IMU                                             <- confirmed by Alex
-      //#define SIRIUSGPS       // Sirius Navigator IMU  using external MAG on GPS board            <- confirmed by Alex
-      //#define SIRIUS600       // Sirius Navigator IMU  using the WMP for the gyro
-      //#define SIRIUS_AIR      // Sirius Navigator IMU 6050 32U4 from MultiWiiCopter.com           <- confirmed by Alex
-      //#define SIRIUS_AIR_GPS  // Sirius Navigator IMU 6050 32U4 from MultiWiiCopter.com with GPS/MAG remote located
-      //#define SIRIUS_MEGAv5_OSD //  Paris_Sirius™ ITG3050,BMA280,MS5611,HMC5883,uBlox  http://www.Multiwiicopter.com <- confirmed by Alex
-      //#define MINIWII         // Jussi's MiniWii Flight Controller                                <- confirmed by Alex
-      //#define MICROWII        // MicroWii 10DOF with ATmega32u4, MPU6050, HMC5883L, MS561101BA from http://flyduino.net/
-      //#define CITRUSv2_1      // CITRUS from qcrc.ca
-      //#define CHERRY6DOFv1_0
-      //#define DROTEK_10DOF    // Drotek 10DOF with ITG3200, BMA180, HMC5883, BMP085, w or w/o LLC
-      //#define DROTEK_10DOF_MS // Drotek 10DOF with ITG3200, BMA180, HMC5883, MS5611, LLC
-      //#define DROTEK_6DOFv2   // Drotek 6DOF v2
-      //#define DROTEK_6DOF_MPU // Drotek 6DOF with MPU6050
-      //#define DROTEK_10DOF_MPU//
-      //#define MONGOOSE1_0     // mongoose 1.0    http://store.ckdevices.com/
-      //#define CRIUS_LITE      // Crius MultiWii Lite
-      //#define CRIUS_SE        // Crius MultiWii SE
-      //#define CRIUS_SE_v2_0   // Crius MultiWii SE 2.0 with MPU6050, HMC5883 and BMP085
-      //#define OPENLRSv2MULTI  // OpenLRS v2 Multi Rc Receiver board including ITG3205 and ADXL345
-      //#define BOARD_PROTO_1   // with MPU6050 + HMC5883L + MS baro
-      //#define BOARD_PROTO_2   // with MPU6050 + slave  MAG3110 + MS baro
-      //#define GY_80           // Chinese 10 DOF with  L3G4200D ADXL345 HMC5883L BMP085, LLC
-      //#define GY_85           // Chinese 9 DOF with  ITG3205 ADXL345 HMC5883L LLC
-      //#define GY_86           // Chinese 10 DOF with  MPU6050 HMC5883L MS5611, LLC
-      //#define GY_521          // Chinese 6  DOF with  MPU6050, LLC
-      //#define INNOVWORKS_10DOF // with ITG3200, BMA180, HMC5883, BMP085 available here http://www.diymulticopter.com
-      //#define INNOVWORKS_6DOF // with ITG3200, BMA180 available here http://www.diymulticopter.com
-      //#define MultiWiiMega    // MEGA + MPU6050+HMC5883L+MS5611 available here http://www.diymulticopter.com
-      //#define PROTO_DIY       // 10DOF mega board
-      //#define IOI_MINI_MULTIWII// www.bambucopter.com
-      //#define Bobs_6DOF_V1     // BobsQuads 6DOF V1 with ITG3200 & BMA180
-      //#define Bobs_9DOF_V1     // BobsQuads 9DOF V1 with ITG3200, BMA180 & HMC5883L
-      //#define Bobs_10DOF_BMP_V1 // BobsQuads 10DOF V1 with ITG3200, BMA180, HMC5883L & BMP180 - BMP180 is software compatible with BMP085
-      //#define FLYDUINO_MPU       // MPU6050 Break Out onboard 3.3V reg
-      //#define CRIUS_AIO_PRO_V1
-      //#define DESQUARED6DOFV2GO  // DEsquared V2 with ITG3200 only
-      //#define DESQUARED6DOFV4    // DEsquared V4 with MPU6050
-      //#define LADYBIRD
-      //#define MEGAWAP_V2_STD     // available here: http://www.multircshop.com                    <- confirmed by Alex
-      //#define MEGAWAP_V2_ADV
-      //#define HK_MultiWii_SE_V2  // Hobbyking board with MPU6050 + HMC5883L + BMP085
-      //#define HK_MultiWii_328P   // Also labeled "Hobbybro" on the back.  ITG3205 + BMA180 + BMP085 + NMC5583L + DSM2 Connector (Spektrum Satellite)  
-      //#define RCNet_FC           // RCNet FC with MPU6050 and MS561101BA  http://www.rcnet.com
-      //#define RCNet_FC_GPS       // RCNet FC with MPU6050 + MS561101BA + HMC5883L + UBLOX GPS http://www.rcnet.com
-      //#define FLYDU_ULTRA        // MEGA+10DOF+MT3339 FC
-      //#define DIYFLYING_MAGE_V1  // diyflying 10DOF mega board with MPU6050 + HMC5883L + BMP085 http://www.indoor-flying.hk
-      //#define MultiWii_32U4_SE         // Hextronik MultiWii_32U4_SE
-      //#define MultiWii_32U4_SE_no_baro // Hextronik MultiWii_32U4_SE without the MS561101BA for more free flash-memory
-      //#define Flyduino9DOF       // Flyduino 9DOF IMU MPU6050+HMC5883l
-      //#define Nano_Plane         // Multiwii Plane version with tail-front LSM330 sensor http://www.radiosait.ru/en/page_5324.html
-      
+
+      //#define CRIUS_SE        // Crius MultiWii SE, testing only
+      //#define HK_MICRO_MWC 
+      #define HK_MICRO_X
+	  //#define HK_POCKETQUAD
+     
     /***************************    independent sensors    ********************************/
       /* leave it commented if you already checked a specific board above */
       /* I2C gyroscope */
@@ -188,12 +109,6 @@
       //#define AK8975
       //#define MAG3110
 
-      /* Sonar */ // for visualization purpose currently - no control code behind
-      //#define SRF02 // use the Devantech SRF i2c sensors
-      //#define SRF08
-      //#define SRF10
-      //#define SRF23
-
       /* ADC accelerometer */ // for 5DOF from sparkfun, uses analog PIN A1/A2/A3
       //#define ADCACC
 
@@ -209,7 +124,9 @@
       //#define SENSORS_TILT_45DEG_RIGHT        // rotate the FRONT 45 degres clockwise
       //#define SENSORS_TILT_45DEG_LEFT         // rotate the FRONT 45 degres counterclockwise
 
-
+	// magless HF & HH
+	#define HEADFREE
+	#define HEADHOLD
 /*************************************************************************************************/
 /*****************                                                                 ***************/
 /****************  SECTION  2 - COPTER TYPE SPECIFIC OPTIONS                               *******/
@@ -226,7 +143,7 @@
     #define YAW_DIRECTION 1
     //#define YAW_DIRECTION -1 // if you want to reverse the yaw correction direction
 
-    #define ONLYARMWHENFLAT //prevent the copter from arming when the copter is tilted
+    //#define ONLYARMWHENFLAT //prevent the copter from arming when the copter is tilted
 
    /********************************    ARM/DISARM    *********************************/
    /* optionally disable stick combinations to arm/disarm the motors.
@@ -266,18 +183,6 @@
     
     //#define FLAPS                       // Traditional Flaps on SERVO3.
     //#define FLAPSPEED     3             // Make flaps move slowm Higher value is Higher Speed.
-
-  /***********************      Common for Heli & Airplane         ***********************/
-
-    /* Governor: attempts to maintain rpm through pitch and voltage changes
-     * predictive approach: observe input signals and voltage and guess appropriate corrections.
-     * (the throttle curve must leave room for the governor, so 0-50-75-80-80 is ok, 0-50-95-100-100 is _not_ ok.
-     * Can be toggled via aux switch.
-     */
-    //#define GOVERNOR_P 7     // (*) proportional factor. Higher value -> higher throttle increase. Must be >=1; 0 = turn off
-    //#define GOVERNOR_D 4     // (*) decay timing. Higher value -> takes longer to return throttle to normal. Must be >=1;
-
-    //#define VOLTAGEDROP_COMPENSATION // voltage impact correction
 
   /***********************          Heli                           ***********************/
     /* Channel to control CollectivePitch */
@@ -330,11 +235,14 @@
     /****************************    PPM Sum Reciver    ***********************************/
       /* The following lines apply only for specific receiver with only one PPM sum signal, on digital PIN 2
          Select the right line depending on your radio brand. Feel free to modify the order in your PPM order is different */
-      //#define SERIAL_SUM_PPM         PITCH,YAW,THROTTLE,ROLL,AUX1,AUX2,AUX3,AUX4,8,9,10,11 //For Graupner/Spektrum
+
+      #if defined(HK_MICRO_MWC) || defined(HK_MICRO_X)
+        #define SERIAL_SUM_PPM         PITCH,YAW,THROTTLE,ROLL,AUX1,AUX2,AUX3,AUX4,8,9,10,11 //For Graupner/Spektrum
       //#define SERIAL_SUM_PPM         ROLL,PITCH,THROTTLE,YAW,AUX1,AUX2,AUX3,AUX4,8,9,10,11 //For Robe/Hitec/Futaba
       //#define SERIAL_SUM_PPM         ROLL,PITCH,YAW,THROTTLE,AUX1,AUX2,AUX3,AUX4,8,9,10,11 //For Multiplex
       //#define SERIAL_SUM_PPM         PITCH,ROLL,THROTTLE,YAW,AUX1,AUX2,AUX3,AUX4,8,9,10,11 //For some Hitec/Sanwa/Others
-
+      #endif
+      
       // Uncommenting following line allow to connect PPM_SUM receiver to standard THROTTLE PIN on MEGA boards (eg. A8 in CRIUS AIO)
       //#define PPM_ON_THROTTLE
 
@@ -343,22 +251,13 @@
          Spektrum Satellites are 3V devices.  DO NOT connect to 5V!
          For MEGA boards, attach sat grey wire to RX1, pin 19. Sat black wire to ground. Sat orange wire to Mega board's 3.3V (or any other 3V to 3.3V source).
          For PROMINI, attach sat grey to RX0.  Attach sat black to ground. */
-      //#define SPEKTRUM 1024
-      //#define SPEKTRUM 2048
-      //#define SPEK_SERIAL_PORT 1    // Forced to 0 on Pro Mini and single serial boards; Set to your choice of 0, 1, or 2 on any Mega based board (defaults to 1 on Mega).
-      //**************************
-      // Defines that allow a "Bind" of a Spektrum or Compatible Remote Receiver (aka Satellite) via Configuration GUI.
-      //   Bind mode will be same as declared above, if your TX is capable.
-      //   Ground, Power, and Signal must come from three adjacent pins. 
-      //   By default, these are Ground=4, Power=5, Signal=6.  These pins are in a row on most MultiWii shield boards. Pins can be overriden below.  
-      //   Normally use 3.3V regulator is needed on the power pin!!  If your satellite hangs during bind (blinks, but won't complete bind with a solid light), go direct 5V on all pins. 
-      //**************************
-      //   For Pro Mini, the connector for the Satellite that resides on the FTDI can be unplugged and moved to these three adjacent pins. 
-      //#define SPEK_BIND             //Un-Comment for Spektrum Satellie Bind Support.  Code is ~420 bytes smaller without it. 
-      //#define SPEK_BIND_GROUND 4
-      //#define SPEK_BIND_POWER  5
-      //#define SPEK_BIND_DATA   6
 
+      #if defined(HK_POCKETQUAD)
+        #define SPEKTRUM 1024
+      //#define SPEKTRUM 2048
+        #define SPEK_SERIAL_PORT 1    // Forced to 0 on Pro Mini and single serial boards; Set to your choice of 0, 1, or 2 on any Mega based board (defaults to 1 on Mega).
+      #endif
+      
     /*******************************    SBUS RECIVER    ************************************/
       /* The following line apply only for Futaba S-Bus Receiver on MEGA boards at RX1 only (Serial 1) or PROMICRO boards.
          You have to invert the S-Bus-Serial Signal e.g. with a Hex-Inverter like IC SN74 LS 04 */
@@ -403,7 +302,7 @@
 
     /*********************************    pin Layout     **********************************/
       /* activate this for a better pinlayout if all pins can be used => not possible on ProMicro */
-      //#define A32U4ALLPINS
+      #define A32U4ALLPINS
 
     /**********************************    PWM Setup     **********************************/
       /* activate all 6 hardware PWM outputs Motor 5 = D11 and 6 = D13. 
@@ -489,7 +388,7 @@
       //#define ITG3200_LPF_256HZ     // This is the default setting, no need to uncomment, just for reference
       //#define ITG3200_LPF_188HZ
       //#define ITG3200_LPF_98HZ
-      //#define ITG3200_LPF_42HZ
+      #define ITG3200_LPF_42HZ
       //#define ITG3200_LPF_20HZ
       //#define ITG3200_LPF_10HZ      // Use this only in extreme cases, rather change motors and/or props
 
@@ -501,7 +400,7 @@
       //#define MPU6050_LPF_256HZ     // This is the default setting, no need to uncomment, just for reference
       //#define MPU6050_LPF_188HZ
       //#define MPU6050_LPF_98HZ
-      //#define MPU6050_LPF_42HZ
+      #define MPU6050_LPF_42HZ
       //#define MPU6050_LPF_20HZ
       //#define MPU6050_LPF_10HZ
       //#define MPU6050_LPF_5HZ       // Use this only in extreme cases, rather change motors and/or props
@@ -533,7 +432,7 @@
   /* Automatically increase throttle based on the angle of the copter
      Original idea by Kraut Rob, first implementation HAdrian							*/
 
-  //#define THROTTLE_ANGLE_CORRECTION 40
+  #define THROTTLE_ANGLE_CORRECTION 40
   
  /*************************        Advanced Headfree Mode             ********************/
  /* In Advanced Headfree mode when the copter is farther than ADV_HEADFREE_RANGE meters then 
@@ -568,10 +467,10 @@
        PITCH, ROLL and YAW is centered and THROTTLE is set to FAILSAFE_THROTTLE value. You must set this value to descending about 1m/s or so
        for best results. This value is depended from your configuration, AUW and some other params.  Next, after FAILSAFE_OFF_DELAY the copter is disarmed, 
        and motors is stopped. If RC pulse coming back before reached FAILSAFE_OFF_DELAY time, after the small quard time the RC control is returned to normal. */
-    //#define FAILSAFE                                // uncomment  to activate the failsafe function
-    #define FAILSAFE_DELAY     10                     // Guard time for failsafe activation after signal lost. 1 step = 0.1sec - 1sec in example
-    #define FAILSAFE_OFF_DELAY 200                    // Time for Landing before motors stop in 0.1sec. 1 step = 0.1sec - 20sec in example
-    #define FAILSAFE_THROTTLE  (MINTHROTTLE + 200)    // (*) Throttle level used for landing - may be relative to MINTHROTTLE - as in this case
+    #define FAILSAFE                                // uncomment  to activate the failsafe function
+    #define FAILSAFE_DELAY     1                     // Guard time for failsafe activation after signal lost. 1 step = 0.1sec - 1sec in example
+    #define FAILSAFE_OFF_DELAY 20                    // Time for Landing before motors stop in 0.1sec. 1 step = 0.1sec - 20sec in example
+    #define FAILSAFE_THROTTLE  (MINTHROTTLE + 100)    // (*) Throttle level used for landing - may be relative to MINTHROTTLE - as in this case
     
     #define FAILSAFE_DETECT_TRESHOLD  985
 
@@ -622,7 +521,7 @@
 
     /* introduce a deadband around the stick center
        Must be greater than zero, comment if you dont want a deadband on roll, pitch and yaw */
-    //#define DEADBAND 6
+    #define DEADBAND 10
 
   /**************************************************************************************/
   /***********************                  GPS                **************************/
@@ -807,12 +706,12 @@
        with R1=33k and R2=51k
        vbat = [0;1023]*16/VBATSCALE
        must be associated with #define BUZZER ! */
-    //#define VBAT              // uncomment this line to activate the vbat code
-    #define VBATSCALE       131 // (*) (**) change this value if readed Battery voltage is different than real voltage
-    #define VBATNOMINAL     126 // 12,6V full battery nominal voltage - only used for lcd.telemetry
-    #define VBATLEVEL_WARN1 107 // (*) (**) 10,7V
-    #define VBATLEVEL_WARN2  99 // (*) (**) 9.9V
-    #define VBATLEVEL_CRIT   93 // (*) (**) 9.3V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
+	#define VBAT              // uncomment this line to activate the vbat code
+	// vbatscale moved to def.h
+    #define VBATNOMINAL      42 // 4.2V full battery nominal voltage - only used for lcd.telemetry
+    #define VBATLEVEL_WARN1  32 // 3.3V
+    #define VBATLEVEL_WARN2  31 // 3.2V
+    #define VBATLEVEL_CRIT   30 // 3.0V - critical condition: if vbat ever goes below this value, permanent alarm is triggered
     #define NO_VBAT          16 // Avoid beeping without any battery
 
 
@@ -882,7 +781,7 @@
      * It must be 16 characters total,
      * The last 4 characters will be overwritten with the version number.
      */
-    #define BOARD_NAME "MultiWii   V-.--"
+    #define BOARD_NAME "MultiWii   V2.3a"
     //                  123456789.123456
 
   /*************      Support multiple configuration profiles in EEPROM     ************/
@@ -902,6 +801,18 @@
   /**************************************************************************************/
     //#define EXT_MOTOR_RANGE // using this with wii-esc requires to change MINCOMMAND to 1008 for promini and mega
 
+    #if defined(HK_MICRO_MWC) || defined(HK_MICRO_X)
+      #define EXT_MOTOR_32KHZ // only 511 steps + on your own risk!
+      //#define EXT_MOTOR_4KHZ  // only 328 device
+      //#define EXT_MOTOR_1KHZ  // only 328 device
+    #endif
+    
+    #if defined(HK_POCKETQUAD)
+      //#define EXT_MOTOR_32KHZ  // only 32u4 device
+      //#define EXT_MOTOR_16KHZ  // only 32u4 device
+      #define EXT_MOTOR_8KHZ  // only 32u4 device
+    #endif
+
   /**************************************************************************************/
   /***********************     motor, servo and other presets     ***********************/
   /**************************************************************************************/
@@ -910,7 +821,13 @@
     //#define MOTOR_STOP
 
     /* some radios have not a neutral point centered on 1500. can be changed here */
-    #define MIDRC 1500
+    #if defined(HK_MICRO_MWC)
+      #define MIDRC 1480
+    #elif defined(HK_MICRO_X)
+	  #define MIDRC 1520
+	#else
+      #define MIDRC 1500
+    #endif
 
   /***********************         Servo Refreshrates            ***********************/
     /* Default 50Hz Servo refresh rate*/

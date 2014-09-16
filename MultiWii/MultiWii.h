@@ -1,7 +1,7 @@
 #ifndef MULTIWII_H_
 #define MULTIWII_H_
 
-#define  VERSION  230
+#define  VERSION  232
 
 #include "types.h"
 
@@ -22,7 +22,7 @@
 #define NAV_IMAX               20        // degrees
 
 #define MINCHECK 1100
-#define MAXCHECK 1900
+#define MAXCHECK 1800
 
 extern volatile unsigned long timer0_overflow_count;
 

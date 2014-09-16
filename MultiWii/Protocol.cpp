@@ -3,9 +3,7 @@
 #include "def.h"
 #include "types.h"
 #include "EEPROM.h"
-#include "LCD.h"
 #include "Output.h"
-#include "GPS.h"
 #include "MultiWii.h"
 #include "Serial.h"
 #include "Protocol.h"
@@ -261,6 +259,15 @@ void evaluateCommand() {
    #endif
    case MSP_SET_PID:
      s_struct_w((uint8_t*)&conf.pid[0].P8,3*PIDITEMS);
+     conf.pidset[f.PID_MODE][PID_ROLL].P8 = conf.pid[PIDROLL].P8;
+     conf.pidset[f.PID_MODE][PID_ROLL].I8 = conf.pid[PIDROLL].I8;
+     conf.pidset[f.PID_MODE][PID_ROLL].D8 = conf.pid[PIDROLL].D8;
+     conf.pidset[f.PID_MODE][PID_PITCH].P8 = conf.pid[PIDPITCH].P8;
+     conf.pidset[f.PID_MODE][PID_PITCH].I8 = conf.pid[PIDPITCH].I8;
+     conf.pidset[f.PID_MODE][PID_PITCH].D8 = conf.pid[PIDPITCH].D8;
+     conf.pidset[f.PID_MODE][PID_LEVEL].P8 = conf.pid[PIDLEVEL].P8;
+     conf.pidset[f.PID_MODE][PID_LEVEL].I8 = conf.pid[PIDLEVEL].I8;
+     conf.pidset[f.PID_MODE][PID_LEVEL].D8 = conf.pid[PIDLEVEL].D8;
      break;
    case MSP_SET_BOX:
      s_struct_w((uint8_t*)&conf.activate[0],CHECKBOXITEMS*2);
@@ -375,6 +382,14 @@ void evaluateCommand() {
        if(f.ANGLE_MODE)   tmp |= 1<<BOXANGLE;
        if(f.HORIZON_MODE) tmp |= 1<<BOXHORIZON;
      #endif
+	 
+	 #if defined(HEADFREE)
+		if(f.HEADFREE_MODE) tmp |= 1<<BOXHEADFREE;
+	 #endif
+	 #if defined(HEADHOLD)
+		if(f.HEADHOLD_MODE) tmp |= 1<<BOXHEADHOLD;
+	 #endif
+	 
      #if BARO && (!defined(SUPPRESS_BARO_ALTHOLD))
        if(f.BARO_MODE) tmp |= 1<<BOXBARO;
      #endif
@@ -414,8 +429,8 @@ void evaluateCommand() {
      #if defined(INFLIGHT_ACC_CALIBRATION)
        if(rcOptions[BOXCALIB]) tmp |= 1<<BOXCALIB;
      #endif
-     #if defined(GOVERNOR_P)
-       if(rcOptions[BOXGOV]) tmp |= 1<<BOXGOV;
+     #if defined(PID_SWITCH)
+       if(rcOptions[BOXPID]) tmp |= 1<<BOXPID;
      #endif
      #if defined(OSD_SWITCH)
        if(rcOptions[BOXOSD]) tmp |= 1<<BOXOSD;
@@ -429,7 +444,11 @@ void evaluateCommand() {
      #if defined(DYNBALANCE)
        for(uint8_t axis=0;axis<3;axis++) {imu.gyroData[axis]=imu.gyroADC[axis];imu.accSmooth[axis]= imu.accADC[axis];} // Send the unfiltered Gyro & Acc values to gui.
      #endif 
-     s_struct((uint8_t*)&imu,18);
+     headSerialReply(18);
+     for(uint8_t i=0;i<3;i++) serialize16(imu.accSmooth[i]>>3);
+     for(uint8_t i=0;i<3;i++) serialize16(imu.gyroData[i]);
+     for(uint8_t i=0;i<3;i++) serialize16(imu.magADC[i]);
+     //s_struct((uint8_t*)&imu,18);
      break;
    case MSP_SERVO:
      s_struct((uint8_t*)&servo,16);
